@@ -3,106 +3,386 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Iris – Midnight Gothic</title>
+<title>Iris – Gothic Arcane Midnight</title>
 
 <!-- Gothic Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
 
 <style>
+    :root {
+        --mouse-x: 50%;
+        --mouse-y: 30%;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
     body {
         margin: 0;
         padding: 40px 20px;
         text-align: center;
-        background: linear-gradient(180deg, #020617 0%, #0a0f24 100%);
-        background-attachment: fixed;
+        background: radial-gradient(circle at top, #0b1120 0%, #020617 40%, #000 100%);
         color: #d1d9ff;
+        overflow-x: hidden;
         font-family: 'Cinzel Decorative', serif;
+        min-height: 100vh;
+        position: relative;
     }
 
-    /* Mist Overlay */
-    body::before {
-        content: "";
+    /* ===== Background Layers ===== */
+
+    .bg-layer {
         position: fixed;
         inset: 0;
-        background: radial-gradient(circle at center, rgba(40, 60, 120, 0.25), rgba(0,0,0,0.85));
-        z-index: -1;
+        pointer-events: none;
+        z-index: -3;
     }
 
-    /* Title */
+    /* Stars */
+    .stars {
+        background:
+          radial-gradient(2px 2px at 10% 20%, rgba(255,255,255,0.6), transparent),
+          radial-gradient(1.5px 1.5px at 80% 30%, rgba(180,200,255,0.8), transparent),
+          radial-gradient(1.5px 1.5px at 30% 70%, rgba(200,220,255,0.7), transparent),
+          radial-gradient(2px 2px at 60% 15%, rgba(255,255,255,0.8), transparent),
+          radial-gradient(1px 1px at 90% 80%, rgba(180,200,255,0.9), transparent),
+          radial-gradient(1.5px 1.5px at 15% 90%, rgba(180,200,255,0.6), transparent);
+        opacity: 0.4;
+        animation: starsMove 25s linear infinite;
+    }
+
+    @keyframes starsMove {
+        0% { transform: scale(1) translateY(0); }
+        100% { transform: scale(1.2) translateY(-140px); }
+    }
+
+    /* Mist */
+    .mist {
+        background:
+          repeating-linear-gradient(
+            -45deg,
+            rgba(15,23,42,0.0),
+            rgba(15,23,42,0.0) 20px,
+            rgba(15,23,42,0.35) 40px
+          );
+        mix-blend-mode: screen;
+        opacity: 0.18;
+        filter: blur(4px);
+        animation: mistDrift 40s linear infinite;
+    }
+
+    @keyframes mistDrift {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-300px); }
+    }
+
+    /* Runes */
+    .runes {
+        background-image:
+          radial-gradient(circle at 20% 30%, rgba(56,104,191,0.28) 0, transparent 55%),
+          radial-gradient(circle at 80% 70%, rgba(30,64,175,0.22) 0, transparent 60%);
+        mix-blend-mode: screen;
+        opacity: 0.4;
+        animation: runesPulse 18s ease-in-out infinite alternate;
+    }
+
+    @keyframes runesPulse {
+        0% { opacity: 0.3; transform: scale(1); }
+        100% { opacity: 0.6; transform: scale(1.08); }
+    }
+
+    /* Mouse-follow light */
+    .mouse-light {
+        background:
+          radial-gradient(circle at var(--mouse-x) var(--mouse-y),
+            rgba(56, 189, 248, 0.18),
+            rgba(15,23,42,0.0) 35%);
+        mix-blend-mode: screen;
+        transition: background-position 0.1s linear;
+    }
+
+    /* ===== Particles (magic dust) ===== */
+
+    .particles {
+        position: fixed;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+        z-index: -2;
+    }
+
+    .particles span {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: rgba(191,219,254,0.9);
+        border-radius: 50%;
+        box-shadow: 0 0 8px rgba(129,140,248,0.9);
+        animation: fall 10s linear infinite;
+        opacity: 0.8;
+    }
+
+    @keyframes fall {
+        0% { transform: translateY(-20px) scale(1); opacity: 0; }
+        10% { opacity: 1; }
+        100% { transform: translateY(120vh) scale(0.4); opacity: 0; }
+    }
+
+    /* random-ish positions via nth-child */
+    .particles span:nth-child(1) { left: 10%; animation-duration: 13s; animation-delay: 0s; }
+    .particles span:nth-child(2) { left: 25%; animation-duration: 11s; animation-delay: 2s; }
+    .particles span:nth-child(3) { left: 40%; animation-duration: 14s; animation-delay: 1s; }
+    .particles span:nth-child(4) { left: 55%; animation-duration: 12s; animation-delay: 3s; }
+    .particles span:nth-child(5) { left: 70%; animation-duration: 15s; animation-delay: 0.5s; }
+    .particles span:nth-child(6) { left: 85%; animation-duration: 10s; animation-delay: 4s; }
+    .particles span:nth-child(7) { left: 18%; animation-duration: 16s; animation-delay: 5s; }
+    .particles span:nth-child(8) { left: 33%; animation-duration: 13s; animation-delay: 6s; }
+    .particles span:nth-child(9) { left: 62%; animation-duration: 12s; animation-delay: 7s; }
+    .particles span:nth-child(10){ left: 77%; animation-duration: 14s; animation-delay: 1.5s; }
+
+    /* ===== Main Container ===== */
+
+    .container {
+        max-width: 480px;
+        margin: 0 auto;
+        animation: pageEnter 1.4s ease-out;
+    }
+
+    @keyframes pageEnter {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== Avatar + Magic Circle ===== */
+
+    .avatar-wrapper {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 25px;
+    }
+
+    /* Magic Circle */
+    .magic-circle {
+        position: absolute;
+        inset: -22px;
+        border-radius: 50%;
+        border: 2px solid rgba(129, 140, 248, 0.7);
+        box-shadow:
+            0 0 18px rgba(129,140,248,0.8),
+            0 0 40px rgba(30,64,175,0.85);
+        animation: circleSpin 14s linear infinite;
+    }
+
+    .magic-circle::before,
+    .magic-circle::after {
+        content: "";
+        position: absolute;
+        inset: 18%;
+        border-radius: 50%;
+        border: 1px dashed rgba(191,219,254,0.7);
+        box-shadow: 0 0 15px rgba(129,140,248,0.5);
+    }
+
+    .magic-circle::after {
+        inset: 32%;
+        border-style: solid;
+        border-width: 1px;
+        opacity: 0.8;
+    }
+
+    @keyframes circleSpin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .avatar {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        border: 3px solid #2e4a8e;
+        box-shadow:
+            0 0 25px #1e2f5f,
+            0 0 55px #0b1020;
+        animation: pulse 3s ease-in-out infinite;
+        position: relative;
+        z-index: 1;
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 22px #233a6d; }
+        50% { box-shadow: 0 0 50px #4061c0; }
+        100% { box-shadow: 0 0 22px #233a6d; }
+    }
+
+    /* ===== Title ===== */
+
     h1 {
         font-family: 'UnifrakturMaguntia', cursive;
-        font-size: 50px;
-        letter-spacing: 3px;
-        margin-bottom: 10px;
+        font-size: 52px;
         color: #a5baff;
-        text-shadow: 
-            0 0 10px #233d80,
-            0 0 25px #1a2a50,
-            0 0 45px #0f1630;
+        letter-spacing: 3px;
+        margin: 5px 0 10px;
+        text-shadow:
+            0 0 10px #2c54a3,
+            0 0 25px #1a2750,
+            0 0 60px #0d1225;
+        animation: glitch 2.2s infinite;
+    }
+
+    @keyframes glitch {
+        0% { text-shadow: 2px 2px #708dff, -2px -2px #0013ff; }
+        50% { text-shadow: -2px 2px #4e68ff, 2px -2px #000cff; }
+        100% { text-shadow: 2px -2px #5c7cff, -2px 2px #0005ff; }
     }
 
     .subtitle {
+        opacity: 0.75;
         font-size: 14px;
-        margin-bottom: 25px;
-        opacity: 0.7;
+        margin-bottom: 30px;
         letter-spacing: 2px;
     }
 
-    /* Avatar */
-    .avatar {
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        margin-bottom: 20px;
-        border: 3px solid #253b72;
-        box-shadow:
-            0 0 25px #20406f,
-            0 0 50px #0a1022,
-            inset 0 0 15px #0f1a33;
-    }
+    /* ===== Buttons ===== */
 
-    /* Gothic Buttons */
     .btn {
         display: block;
         width: 92%;
         max-width: 380px;
-        margin: 12px auto;
+        margin: 15px auto;
         padding: 15px;
-        font-size: 19px;
         text-decoration: none;
-        letter-spacing: 1px;
-        border-radius: 12px;
-        border: 2px solid #2e4a8e;
-        background: rgba(12, 18, 40, 0.8);
         color: #d8e0ff;
-        font-family: 'Cinzel', serif;
-        transition: 0.35s;
-        box-shadow: inset 0 0 8px #0b1225;
+        font-size: 19px;
+        letter-spacing: 2px;
+
+        background: radial-gradient(circle at top left, rgba(59,130,246,0.28), rgba(15,23,42,0.9));
+        border: 2px solid rgba(96,165,250,0.55);
+        border-radius: 14px;
+
+        box-shadow:
+            inset 0 0 12px #020617,
+            0 0 22px rgba(30,64,175,0.9);
+
+        transition: 0.25s;
+        animation: btnFloat 4s ease-in-out infinite;
+        position: relative;
+        overflow: hidden;
+    }
+
+    @keyframes btnFloat {
+        0%,100% { transform: translateY(0px); }
+        50%     { transform: translateY(-3px); }
+    }
+
+    /* shine effect on hover */
+    .btn::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -40%;
+        width: 40%;
+        height: 100%;
+        background: linear-gradient(120deg, transparent, rgba(248,250,252,0.5), transparent);
+        transform: skewX(-20deg);
+        opacity: 0;
+    }
+
+    .btn:hover::after {
+        animation: shine 0.6s forwards;
+    }
+
+    @keyframes shine {
+        0% { transform: translateX(0) skewX(-20deg); opacity: 0; }
+        30% { opacity: 1; }
+        100% { transform: translateX(260%) skewX(-20deg); opacity: 0; }
     }
 
     .btn:hover {
-        background: #2e4a8e;
-        color: #fff;
+        background: radial-gradient(circle at center, #3b82f6, #1e293b);
+        color: #f9fafb;
         transform: scale(1.05);
-        box-shadow: 0 0 20px #2e4a8e;
+        box-shadow:
+            0 0 28px #3b82f6,
+            0 0 60px rgba(37,99,235,0.8);
     }
 
+    /* small responsive tweak */
+    @media (max-width: 480px) {
+        h1 { font-size: 42px; }
+        .avatar { width: 140px; height: 140px; }
+    }
 </style>
 </head>
-
 <body>
 
-    <!-- Avatar -->
-    <img src="wall.gif" class="avatar" alt="Iris Avatar">
+<!-- Background layers -->
+<div class="bg-layer stars"></div>
+<div class="bg-layer mist"></div>
+<div class="bg-layer runes"></div>
+<div class="bg-layer mouse-light"></div>
 
-    <!-- Title -->
+<!-- Particles -->
+<div class="particles">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+</div>
+
+<!-- Main content -->
+<div class="container">
+    <div class="avatar-wrapper">
+        <div class="magic-circle"></div>
+        <img src="Chika.gif" alt="Iris" class="avatar">
+    </div>
+
     <h1>Iris</h1>
     <div class="subtitle">Midnight Gothic Realm • Shadowed Moon</div>
 
-    <!-- Buttons -->
-    <a href="https://www.youtube.com/@IRIS_404_error" class="btn" target="_blank">YouTube</a>
-    <a href="https://discord.gg/NWaX6DUZ" class="btn" target="_blank">Discord</a>
-    <a href="https://www.tiktok.com/@iris_doubles?_r=1&_t=ZS-91pTjdk5j7K" class="btn" target="_blank">TikTok</a>
+    <a class="btn" href="https://www.youtube.com/@IRIS_404_error" target="_blank">YouTube</a>
+    <a class="btn" href="https://discord.gg/NWaX6DUZ" target="_blank">Discord</a>
+    <a class="btn" href="https://www.tiktok.com/@ranmach1?_r=1&_t=ZS-91pBxldV3Xc" target="_blank">TikTok</a>
+</div>
+
+<!-- Simple click sound & mouse light script -->
+<script>
+    // Mouse-follow light
+    const mouseLayer = document.querySelector('.mouse-light');
+    window.addEventListener('mousemove', (e) => {
+        const x = (e.clientX / window.innerWidth) * 100;
+        const y = (e.clientY / window.innerHeight) * 100;
+        document.documentElement.style.setProperty('--mouse-x', x + '%');
+        document.documentElement.style.setProperty('--mouse-y', y + '%');
+    });
+
+    // Soft click sound using Web Audio API
+    let audioCtx = null;
+
+    function playClickSound() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+
+        o.type = "sine";
+        o.frequency.setValueAtTime(620, audioCtx.currentTime);
+        o.frequency.exponentialRampToValueAtTime(220, audioCtx.currentTime + 0.12);
+
+        g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+
+        o.connect(g);
+        g.connect(audioCtx.destination);
+        o.start();
+        o.stop(audioCtx.currentTime + 0.12);
+    }
+
+    document.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            try { playClickSound(); } catch(e) {}
+        });
+    });
+</script>
 
 </body>
 </html>
